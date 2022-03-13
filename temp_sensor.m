@@ -53,7 +53,6 @@ IOHIDEventRef IOHIDServiceClientCopyEvent(IOHIDServiceClientRef, int64_t , int32
 CFStringRef IOHIDServiceClientCopyProperty(IOHIDServiceClientRef service, CFStringRef property);
 IOHIDFloat IOHIDEventGetFloatValue(IOHIDEventRef event, int32_t field);
 
-// create a dict ref, like for temperature sensor {"PrimaryUsagePage":0xff00, "PrimaryUsage":0x5}
 CFDictionaryRef matching(int page, int usage)
 {
     CFNumberRef nums[2];
@@ -219,8 +218,7 @@ int main () {
     CFDictionaryRef currentSensors = matching(0xff08, 2);
     CFDictionaryRef voltageSensors = matching(0xff08, 3);
     CFDictionaryRef thermalSensors = matching(0xff00, 5); // 65280_10 = FF00_16
-    // thermalSensors's PrimaryUsagePage should be 0xff00 for M1 chip, instead of 0xff05
-    // can be checked by ioreg -lfx
+    // I change it to 0xff00, due to ioreg -dlx
 
     CFArrayRef currentNames = getProductNames(currentSensors);
     CFArrayRef voltageNames = getProductNames(voltageSensors);
@@ -233,22 +231,37 @@ int main () {
     dumpNames(thermalNames, "C");
     printf("\n"); fflush(stdout);
 
-    while (1) {
-        CFArrayRef currentValues = getPowerValues(currentSensors);
-        CFArrayRef voltageValues = getPowerValues(voltageSensors);
-        CFArrayRef thermalValues = getThermalValues(thermalSensors);
-//        printf("%lld, ", my_mhz());
-//        mybat();
+//     while (1) {
+//         CFArrayRef currentValues = getPowerValues(currentSensors);
+//         CFArrayRef voltageValues = getPowerValues(voltageSensors);
+//         CFArrayRef thermalValues = getThermalValues(thermalSensors);
+// //        printf("%lld, ", my_mhz());
+// //        mybat();
 
-//        dumpValues(voltageValues);
-//        dumpValues(currentValues);
-        dumpValues(thermalValues);
-        printf("\n"); fflush(stdout);
-        usleep(500000); // usleep - suspend execution for microsecond intervals
-        CFRelease(currentValues);
-        CFRelease(voltageValues);
-        CFRelease(thermalValues);
-    }
+// //        dumpValues(voltageValues);
+// //        dumpValues(currentValues);
+//         dumpValues(thermalValues);
+//         printf("\n"); fflush(stdout);
+//         usleep(1000000); // usleep - suspend execution for microsecond intervals
+//         CFRelease(currentValues);
+//         CFRelease(voltageValues);
+//         CFRelease(thermalValues);
+//     }
+
+            CFArrayRef currentValues = getPowerValues(currentSensors);
+            CFArrayRef voltageValues = getPowerValues(voltageSensors);
+            CFArrayRef thermalValues = getThermalValues(thermalSensors);
+        //        printf("%lld, ", my_mhz());
+        //        mybat();
+
+        //        dumpValues(voltageValues);
+        //        dumpValues(currentValues);
+            dumpValues(thermalValues);
+            printf("\n"); fflush(stdout);
+            usleep(1000000); // usleep - suspend execution for microsecond intervals
+            CFRelease(currentValues);
+            CFRelease(voltageValues);
+            CFRelease(thermalValues);
 
 #if 0
     NSLog(@"%@\n", CFArrayGetValueAtIndex(currentNames, 0));
